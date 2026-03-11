@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.next/
+*.pyc
+__pycache__/
+frontend/.env.local
+frontend/.env.local.*
+backend/.env
+backend/venv/
+backend/.pytest_cache/
+backend/app.db
+*.sqlite3

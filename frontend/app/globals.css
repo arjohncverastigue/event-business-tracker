@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark light;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root[data-theme='dark'] {
+  --background: #040708;
+  --foreground: #f5f7f9;
+  --foreground-rgb: 245, 247, 249;
+  --body-bg: radial-gradient(circle at top, #102437 0%, #040708 60%);
+  --card: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --accent: #7ff0d3;
+  --accent-strong: #00c896;
+  --muted: rgba(245, 247, 249, 0.65);
+}
+
+:root[data-theme='light'] {
+  --background: #f4f6fb;
+  --foreground: #0b1013;
+  --foreground-rgb: 11, 16, 19;
+  --body-bg: radial-gradient(circle at top, #ffffff 0%, #dde5f3 70%);
+  --card: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(12, 23, 43, 0.08);
+  --accent: #007dc5;
+  --accent-strong: #00c896;
+  --muted: rgba(12, 23, 43, 0.65);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--body-bg);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui;
+  letter-spacing: 0.01em;
+  transition: background 0.4s ease, color 0.3s ease;
+}
+
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.7), transparent 65%);
+}
+
+:root[data-theme='light'] .grid-overlay {
+  background-image: linear-gradient(
+      rgba(0, 0, 0, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.7), transparent 65%);
+}
+
+.glass-panel {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.cta-button {
+  background: linear-gradient(120deg, var(--accent), var(--accent-strong));
+  color: #041417;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.ghost-button {
+  border-radius: 999px;
+  border: 1px solid var(--card-border);
+  color: var(--foreground);
+}
+
+:root[data-theme='light'] .text-white,
+:root[data-theme='light'] .hover\:text-white:hover {
+  color: rgb(var(--foreground-rgb)) !important;
+}
+
+:root[data-theme='light'] .text-white\/80,
+:root[data-theme='light'] .text-white\/80:hover,
+:root[data-theme='light'] .hover\:text-white\/80:hover {
+  color: rgba(var(--foreground-rgb), 0.8) !important;
+}
+
+:root[data-theme='light'] .text-white\/70,
+:root[data-theme='light'] .hover\:text-white\/70:hover {
+  color: rgba(var(--foreground-rgb), 0.7) !important;
+}
+
+:root[data-theme='light'] .text-white\/60,
+:root[data-theme='light'] .hover\:text-white\/60:hover {
+  color: rgba(var(--foreground-rgb), 0.6) !important;
+}
+
+:root[data-theme='light'] .placeholder\:text-white\/40::placeholder {
+  color: rgba(var(--foreground-rgb), 0.4) !important;
+}
