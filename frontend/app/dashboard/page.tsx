@@ -165,7 +165,7 @@ export default function DashboardPage() {
                     <YAxis stroke="var(--muted)" tick={{ fill: "var(--muted)", fontSize: 12 }} />
                     <Tooltip
                       contentStyle={{ background: "rgba(0,0,0,0.8)", borderRadius: 12, border: "none" }}
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, "Value"]}
+                      formatter={(value) => [`$${(value ?? 0).toLocaleString()}`, "Value"]}
                     />
                     <Line type="monotone" dataKey="value" stroke="#7ff0d3" strokeWidth={2} dot={false} />
                   </LineChart>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
                     <YAxis stroke="var(--muted)" tick={{ fill: "var(--muted)" }} />
                     <Tooltip
                       contentStyle={{ background: "rgba(0,0,0,0.8)", borderRadius: 12, border: "none" }}
-                      formatter={(value: number, name) => [`$${value.toLocaleString()}`, name]}
+                      formatter={(value, name) => [`$${(value ?? 0).toLocaleString()}`, name]}
                     />
                     <Bar dataKey="income" fill="#7ff0d3" radius={[8, 8, 0, 0]} />
                     <Bar dataKey="expense" fill="#ff9f7f" radius={[8, 8, 0, 0]} />
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ background: "rgba(0,0,0,0.8)", borderRadius: 12, border: "none" }}
-                    formatter={(value: number, name) => [`${value} quotes`, name.toString()]}
+                    formatter={(value, name) => [`${value ?? 0} quotes`, name?.toString() ?? "Unknown"]}
                   />
                 </PieChart>
               </ResponsiveContainer>
