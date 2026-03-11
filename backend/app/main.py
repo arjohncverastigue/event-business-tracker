@@ -19,7 +19,13 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Event Business Tracker API", version="0.1.0")
 
 frontend_origin = os.getenv("FRONTEND_URL", "http://localhost:3000")
-allowed_origins = {frontend_origin, "http://localhost:3000"}
+allowed_origins = {
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://event-business-tracker-web-production.up.railway.app",
+    "https://event-business-tracker-web-staging.up.railway.app",
+    frontend_origin,
+}
 
 app.add_middleware(
     CORSMiddleware,
