@@ -192,5 +192,5 @@ MAIL_SERVER=smtp.gmail.com
 
 **frontend/.env.local**
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=https://localhost:8000
 ```
