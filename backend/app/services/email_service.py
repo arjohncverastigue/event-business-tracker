@@ -1,29 +1,34 @@
 import os
-from typing import Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from fastapi import HTTPException
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import EmailStr
+
+if TYPE_CHECKING:
+    from fastapi_mail import FastMail
 
 MAIL_USERNAME = os.getenv("MAIL_USERNAME")
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_FROM = os.getenv("MAIL_FROM", MAIL_USERNAME or "noreply@example.com")
-MAIL_FROM_NAME = os.getenv("MAIL_FROM_NAME", "Event Business Tracker")
-MAIL_SERVER = os.getenv("MAIL_SERVER", "smtp.gmail.com")
-MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
 
-conf: Optional[ConnectionConfig] = None
+fast_mail: Optional["FastMail"] = None
+
 if MAIL_USERNAME and MAIL_PASSWORD:
-    conf = ConnectionConfig(
-        MAIL_USERNAME=MAIL_USERNAME,
-        MAIL_PASSWORD=MAIL_PASSWORD,
-        MAIL_FROM=MAIL_FROM,
-        MAIL_FROM_NAME=MAIL_FROM_NAME,
-        MAIL_SERVER=MAIL_SERVER,
-        MAIL_PORT=MAIL_PORT,
-        MAIL_SSL_TLS=True,
-        USE_CREDENTIALS=True,
-    )
+    try:
+        from fastapi_mail import ConnectionConfig, FastMail
+
+        conf = ConnectionConfig(
+            MAIL_USERNAME=MAIL_USERNAME,
+            MAIL_PASSWORD=MAIL_PASSWORD,
+            MAIL_FROM=os.getenv("MAIL_FROM", MAIL_USERNAME),
+            MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME", "Event Business Tracker"),
+            MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
+            MAIL_PORT=int(os.getenv("MAIL_PORT", "587")),
+            MAIL_SSL_TLS=True,
+            USE_CREDENTIALS=True,
+        )
+        fast_mail = FastMail(conf)
+    except Exception as e:
+        print(f"Email service initialization failed: {e}")
 
 
 async def send_quotation_email(
@@ -32,10 +37,11 @@ async def send_quotation_email(
     body: str,
     attachment: Optional[Tuple[str, bytes]] = None,
 ) -> None:
-    if conf is None:
+    if fast_mail is None:
         raise HTTPException(status_code=500, detail="Email service is not configured")
 
-    fast_mail = FastMail(conf)
+    from fastapi_mail import MessageSchema, MessageType
+
     message = MessageSchema(
         subject=subject,
         recipients=[recipient],
