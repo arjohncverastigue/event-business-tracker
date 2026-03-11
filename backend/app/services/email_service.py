@@ -21,8 +21,7 @@ if MAIL_USERNAME and MAIL_PASSWORD:
         MAIL_FROM_NAME=MAIL_FROM_NAME,
         MAIL_SERVER=MAIL_SERVER,
         MAIL_PORT=MAIL_PORT,
-        MAIL_TLS=True,
-        MAIL_SSL=False,
+        MAIL_SSL_TLS=True,
         USE_CREDENTIALS=True,
     )
 
