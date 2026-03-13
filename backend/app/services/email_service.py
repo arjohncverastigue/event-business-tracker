@@ -29,9 +29,9 @@ async def send_quotation_email(
     conf = ConnectionConfig(
         MAIL_USERNAME=MAIL_USERNAME,
         MAIL_PASSWORD=MAIL_PASSWORD,
-        MAIL_FROM=os.getenv("MAIL_FROM", MAIL_USERNAME),
+        MAIL_FROM=os.getenv("MAIL_FROM", "onboarding@resend.dev"),
         MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME", "Event Business Tracker"),
-        MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
+        MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.resend.com"),
         MAIL_PORT=int(os.getenv("MAIL_PORT", "587")),
         MAIL_STARTTLS=True,
         MAIL_SSL_TLS=False,
@@ -40,13 +40,8 @@ async def send_quotation_email(
     )
 
     fast_mail = FastMail(conf)
-    message = MessageSchema(
-        subject=subject,
-        recipients=[NameEmail(name=str(recipient), email=str(recipient))],
-        body=body,
-        subtype=MessageType.html,
-    )
-
+    
+    attachments_list: list = []
     if attachment:
         filename, content = attachment
         # Create UploadFile object for the attachment
@@ -59,16 +54,20 @@ async def send_quotation_email(
             file=file_content
         )
         
-        # Set attachments in the format expected after validation: list of (UploadFile, metadata_dict) tuples
-        message.attachments = [
-            (
-                upload_file,
-                {
-                    "filename": filename,
-                    "content_type": "application/pdf"
-                }
-            )
-        ]
+        # Use UploadFile directly without metadata
+        attachments_list = [upload_file]
+    
+    # Build message dict and create schema
+    msg_data = {
+        "subject": subject,
+        "recipients": [NameEmail(name=str(recipient), email=str(recipient))],
+        "body": body,
+        "subtype": MessageType.html,
+    }
+    if attachments_list:
+        msg_data["attachments"] = attachments_list
+    
+    message = MessageSchema(**msg_data)
 
     try:
         await fast_mail.send_message(message)
