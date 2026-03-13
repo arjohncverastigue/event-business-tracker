@@ -64,15 +64,22 @@ async def send_quotation_email(
         "body": body,
         "subtype": MessageType.html,
     }
-    if attachments_list:
-        msg_data["attachments"] = attachments_list
+    # Temporarily disable attachments to test basic email
+    # if attachments_list:
+    #     msg_data["attachments"] = attachments_list
     
     message = MessageSchema(**msg_data)
 
     try:
         await fast_mail.send_message(message)
     except Exception as e:
+        import traceback
         error_msg = str(e)
+        traceback_str = traceback.format_exc()
+        # Log the full error for debugging
+        print(f"Email send error: {error_msg}")
+        print(f"Traceback: {traceback_str}")
+        
         if "Timed out connecting" in error_msg:
             raise HTTPException(
                 status_code=500, 
