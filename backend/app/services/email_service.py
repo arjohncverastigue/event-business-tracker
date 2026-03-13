@@ -1,8 +1,10 @@
 import os
 from typing import Optional, Tuple
+from io import BytesIO
 
 from fastapi import HTTPException
 from pydantic import EmailStr, NameEmail, SecretStr
+from starlette.datastructures import UploadFile
 
 MAIL_USERNAME: Optional[str] = os.getenv("MAIL_USERNAME")
 MAIL_PASSWORD: SecretStr = SecretStr(os.getenv("MAIL_PASSWORD", ""))
@@ -37,22 +39,38 @@ async def send_quotation_email(
     fast_mail = FastMail(conf)
     message = MessageSchema(
         subject=subject,
-        recipients=[NameEmail(name=recipient, email=recipient)],
+        recipients=[NameEmail(name=str(recipient), email=str(recipient))],
         body=body,
         subtype=MessageType.html,
     )
 
     if attachment:
         filename, content = attachment
+        # Create UploadFile object for the attachment
+        from io import BytesIO
+        from starlette.datastructures import UploadFile
+        
+        file_content = BytesIO(content)
+        upload_file = UploadFile(
+            filename=filename,
+            file=file_content
+        )
+        
+        # Set attachments in the format expected after validation: list of (UploadFile, metadata_dict) tuples
         message.attachments = [
-            {
-                "file": content,
-                "filename": filename,
-                "content_type": "application/pdf",
-            }
+            (
+                upload_file,
+                {
+                    "filename": filename,
+                    "content_type": "application/pdf"
+                }
+            )
         ]
 
     try:
         await fast_mail.send_message(message)
     except Exception as e:
+        import traceback
+        print(f"Error sending email: {str(e)}")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
