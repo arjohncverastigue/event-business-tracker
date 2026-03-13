@@ -5,8 +5,8 @@ from fastapi import HTTPException
 from pydantic import EmailStr
 
 MAIL_RESEND_API_KEY: Optional[str] = os.getenv("MAIL_RESEND_API_KEY")
-MAIL_FROM: Optional[str] = os.getenv("MAIL_FROM", "onboarding@resend.dev")
-MAIL_FROM_NAME: str = os.getenv("MAIL_FROM_NAME", "Event Business Tracker")
+MAIL_FROM: str = os.getenv("MAIL_FROM", "onboarding@resend.dev")
+MAIL_FROM_NAME_DEFAULT: str = "Event Business Tracker"
 
 
 async def send_quotation_email(
@@ -15,9 +15,26 @@ async def send_quotation_email(
     body: str,
     attachment: Optional[Tuple[str, bytes]] = None,
 ) -> None:
-    print(f"DEBUG: MAIL_RESEND_API_KEY = {MAIL_RESEND_API_KEY}")
+    mail_from_name = os.getenv("MAIL_FROM_NAME") or MAIL_FROM_NAME_DEFAULT
+    
+    print(f"DEBUG: MAIL_RESEND_API_KEY = {MAIL_RESEND_API_KEY[:10]}..." if MAIL_RESEND_API_KEY else "DEBUG: MAIL_RESEND_API_KEY = None")
     print(f"DEBUG: MAIL_FROM = {MAIL_FROM}")
-    print(f"DEBUG: MAIL_FROM_NAME = {MAIL_FROM_NAME}")
+    print(f"DEBUG: MAIL_FROM_NAME raw = '{mail_from_name}'")
+    
+    # Validate MAIL_FROM_NAME - ensure it's safe
+    try:
+        if mail_from_name and len(mail_from_name) >= 2:
+            # Check if all characters are printable ASCII or whitespace
+            test_str = str(mail_from_name)
+            is_safe = all(ord(c) < 128 or c.isspace() for c in test_str)
+            if not is_safe:
+                mail_from_name = MAIL_FROM_NAME_DEFAULT
+        else:
+            mail_from_name = MAIL_FROM_NAME_DEFAULT
+    except:
+        mail_from_name = MAIL_FROM_NAME_DEFAULT
+    
+    print(f"DEBUG: Using MAIL_FROM_NAME = '{mail_from_name}'")
     
     if not MAIL_RESEND_API_KEY:
         raise HTTPException(status_code=500, detail="Email service is not configured - missing MAIL_RESEND_API_KEY")
@@ -30,7 +47,7 @@ async def send_quotation_email(
     resend.api_key = MAIL_RESEND_API_KEY
 
     email_data = {
-        "from": f"{MAIL_FROM_NAME} <{MAIL_FROM}>",
+        "from": f"{mail_from_name} <{MAIL_FROM}>",
         "to": [recipient],
         "subject": subject,
         "html": body,
