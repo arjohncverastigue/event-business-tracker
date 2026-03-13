@@ -18,16 +18,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             every client conversation protected.
           </p>
         </div>
-        <div className="relative space-y-3 text-sm text-[var(--muted)]">
-          <p className="text-xs uppercase tracking-[0.5em] text-white/60">Roadmap</p>
-          <ul className="space-y-2">
-            <li>Day 1 · Auth & Models</li>
-            <li>Day 2 · Bookings + Finances</li>
-            <li>Day 3 · Quotations + AI</li>
-            <li>Day 4 · Exports + Email</li>
-            <li>Day 5 · Dashboard polish</li>
-          </ul>
-        </div>
+        
       </div>
       <div className="flex w-full flex-1 items-center justify-center px-6 py-10 sm:px-10">
         <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl">

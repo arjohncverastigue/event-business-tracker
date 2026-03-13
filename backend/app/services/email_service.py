@@ -2,10 +2,10 @@ import os
 from typing import Optional, Tuple
 
 from fastapi import HTTPException
-from pydantic import EmailStr
+from pydantic import EmailStr, NameEmail, SecretStr
 
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
+MAIL_USERNAME: Optional[str] = os.getenv("MAIL_USERNAME")
+MAIL_PASSWORD: SecretStr = SecretStr(os.getenv("MAIL_PASSWORD", ""))
 
 
 async def send_quotation_email(
@@ -14,13 +14,13 @@ async def send_quotation_email(
     body: str,
     attachment: Optional[Tuple[str, bytes]] = None,
 ) -> None:
-    if not MAIL_USERNAME or not MAIL_PASSWORD:
+    if not MAIL_USERNAME or not MAIL_PASSWORD.get_secret_value():
         raise HTTPException(status_code=500, detail="Email service is not configured")
 
     try:
         from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
-    except ImportError:
-        raise HTTPException(status_code=500, detail="Email service not available - please install fastapi-mail")
+    except ImportError as e:
+        raise HTTPException(status_code=500, detail=f"Email service not available - please install fastapi-mail: {str(e)}")
 
     conf = ConnectionConfig(
         MAIL_USERNAME=MAIL_USERNAME,
@@ -29,14 +29,15 @@ async def send_quotation_email(
         MAIL_FROM_NAME=os.getenv("MAIL_FROM_NAME", "Event Business Tracker"),
         MAIL_SERVER=os.getenv("MAIL_SERVER", "smtp.gmail.com"),
         MAIL_PORT=int(os.getenv("MAIL_PORT", "587")),
-        MAIL_SSL_TLS=True,
+        MAIL_STARTTLS=True,
+        MAIL_SSL_TLS=False,
         USE_CREDENTIALS=True,
     )
 
     fast_mail = FastMail(conf)
     message = MessageSchema(
         subject=subject,
-        recipients=[recipient],
+        recipients=[NameEmail(name=recipient, email=recipient)],
         body=body,
         subtype=MessageType.html,
     )
@@ -51,4 +52,7 @@ async def send_quotation_email(
             }
         ]
 
-    await fast_mail.send_message(message)
+    try:
+        await fast_mail.send_message(message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
