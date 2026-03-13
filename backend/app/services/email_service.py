@@ -24,6 +24,8 @@ async def send_quotation_email(
     except ImportError as e:
         raise HTTPException(status_code=500, detail=f"Email service not available - please install fastapi-mail: {str(e)}")
 
+    timeout = int(os.getenv("MAIL_TIMEOUT", "30"))
+    
     conf = ConnectionConfig(
         MAIL_USERNAME=MAIL_USERNAME,
         MAIL_PASSWORD=MAIL_PASSWORD,
@@ -34,6 +36,7 @@ async def send_quotation_email(
         MAIL_STARTTLS=True,
         MAIL_SSL_TLS=False,
         USE_CREDENTIALS=True,
+        TIMEOUT=timeout,
     )
 
     fast_mail = FastMail(conf)
@@ -70,7 +73,10 @@ async def send_quotation_email(
     try:
         await fast_mail.send_message(message)
     except Exception as e:
-        import traceback
-        print(f"Error sending email: {str(e)}")
-        print(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+        error_msg = str(e)
+        if "Timed out connecting" in error_msg:
+            raise HTTPException(
+                status_code=500, 
+                detail="Email service timeout. This is likely a network connectivity issue from the server to Gmail SMTP. Check if your hosting provider (Railway) allows outbound SMTP connections, or consider using a transactional email service like SendGrid, Mailgun, or Resend."
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {error_msg}")
