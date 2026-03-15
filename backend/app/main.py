@@ -27,8 +27,7 @@ frontend_origin = os.getenv("FRONTEND_URL", "http://localhost:3000")
 allowed_origins = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://event-business-tracker-web-production.up.railway.app",
-    "https://event-business-tracker-web-staging.up.railway.app",
+    "https://event-business-tracker-1.onrender.com",
     frontend_origin,
 }
 
