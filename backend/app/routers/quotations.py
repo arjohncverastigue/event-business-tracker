@@ -79,9 +79,9 @@ def update_quotation(
     current_user: User = Depends(get_current_user),
 ):
     quotation = _get_quotation_or_404(db, quotation_id, current_user.id)
-    update_data = payload.model_dump(exclude_unset=True)
+    update_data = payload.model_dump(exclude_unset=True, mode="json")
     if "items" in update_data and update_data["items"] is not None:
-        update_data["items"] = [item.model_dump() for item in update_data["items"]]
+        update_data["items"] = [dict(item) if hasattr(item, "model_dump") else item for item in update_data["items"]]
     for field, value in update_data.items():
         setattr(quotation, field, value)
     db.add(quotation)
