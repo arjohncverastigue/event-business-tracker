@@ -24,7 +24,7 @@ async def send_quotation_email(
 
     try:
         message = Mail(
-            from_email=MAIL_FROM,
+            from_email=(MAIL_FROM, MAIL_FROM_NAME),
             to_emails=recipient,
             subject=subject,
             html_content=body,
@@ -52,5 +52,10 @@ async def send_quotation_email(
 
 def _send_email_sync(message: Mail) -> None:
     sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
-    response = sg.send(message)
-    print(f"DEBUG: SendGrid response: {response.status_code}")
+    try:
+        response = sg.send(message)
+        print(f"DEBUG: SendGrid response status: {response.status_code}")
+        print(f"DEBUG: SendGrid response body: {response.body}")
+    except Exception as e:
+        print(f"DEBUG: SendGrid error: {str(e)}")
+        raise
