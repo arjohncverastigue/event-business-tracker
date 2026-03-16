@@ -260,42 +260,6 @@ export default function DashboardPage() {
           </article>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Quotation pipeline</p>
-              <h3 className="text-lg font-semibold text-white">Status distribution</h3>
-            </div>
-            {quotationsQuery.isFetching && <Loader2 size={16} className="animate-spin text-[var(--muted)]" />}
-          </div>
-          {quotationStatusData.length ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={quotationStatusData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={90}
-                    innerRadius={50}
-                    paddingAngle={3}
-                  >
-                    {quotationStatusData.map((_, index) => (
-                      <Cell key={_.name} fill={["#7ff0d3", "#ff9f7f", "#7f8bff", "#ffd479"][index % 4]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ background: "rgba(0,0,0,0.8)", borderRadius: 12, border: "none" }}
-                    formatter={(value, name) => [`${value ?? 0} quotes`, name?.toString() ?? "Unknown"]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <p className="text-sm text-[var(--muted)]">No quotations yet.</p>
-          )}
-        </section>
-
         <section className="grid gap-6 xl:grid-cols-2">
           <article className="rounded-3xl border border-white/10 bg-white/5 p-6">
             <div className="mb-4 flex items-center justify-between">
@@ -353,25 +317,13 @@ export default function DashboardPage() {
                 </div>
                 <div className="rounded-2xl bg-black/20 p-4">
                   <p className="text-2xl font-semibold text-white">${damageStats.totalCost.toLocaleString()}</p>
-                  <p className="text-xs text-[var(--muted)]">Total Repair Cost</p>
+                  <p className="text-xs text-[var(--muted)]">Total Cost</p>
                 </div>
               </div>
             ) : (
               <p className="text-sm text-[var(--muted)]">No damage reports yet.</p>
             )}
           </article>
-        </section>
-      </div>
-    </main>
-  );
-}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <p className="text-sm text-[var(--muted)]">No quotations yet.</p>
-          )}
         </section>
       </div>
     </main>
