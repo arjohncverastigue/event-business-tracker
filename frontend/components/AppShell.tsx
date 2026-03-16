@@ -6,7 +6,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 
 import { Sidebar } from '@/components/Sidebar';
 
-const SIDEBAR_PREFIXES = ['/dashboard', '/bookings', '/finances', '/quotations'];
+const SIDEBAR_PREFIXES = ['/dashboard', '/bookings', '/finances', '/quotations', '/equipment', '/damage-reports'];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
