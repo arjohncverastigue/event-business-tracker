@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, FileText, Home, LogOut, Menu, Wallet } from 'lucide-react';
+import { Calendar, FileText, Home, LogOut, Menu, Package, ShieldAlert, Wallet } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/bookings', label: 'Bookings', icon: Calendar },
   { href: '/finances', label: 'Finances', icon: Wallet },
   { href: '/quotations', label: 'Quotations', icon: FileText },
+  { href: '/equipment', label: 'Equipment', icon: Package },
+  { href: '/damage-reports', label: 'Damage Reports', icon: ShieldAlert },
 ];
 
 type SidebarProps = {
