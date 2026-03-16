@@ -13,3 +13,4 @@ anthropic>=0.34
 reportlab>=4.0
 openpyxl>=3.1
 psycopg2-binary>=2.9
+sendgrid>=6.10
