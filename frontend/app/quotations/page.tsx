@@ -37,8 +37,9 @@ export default function QuotationsPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [aiBrief, setAiBrief] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
-  const [emailTargets, setEmailTargets] = useState<Record<number, string>>({});
-  const [emailStatus, setEmailStatus] = useState<Record<number, string>>({});
+  // Email sending temporarily disabled
+  // const [emailTargets, setEmailTargets] = useState<Record<number, string>>({});
+  // const [emailStatus, setEmailStatus] = useState<Record<number, string>>({});
 
   const quotationsQuery = useQuery({
     queryKey: ["quotations"],
@@ -148,21 +149,22 @@ export default function QuotationsPage() {
     });
   };
 
-  const sendEmailMutation = useMutation({
-    mutationFn: async ({ quotationId, recipient }: { quotationId: number; recipient: string }) => {
-      await api.post(`/quotations/${quotationId}/send-email`, {
-        recipient,
-        message: aiBrief || undefined,
-      });
-    },
-    onSuccess: (_data, variables) => {
-      setEmailTargets((prev) => ({ ...prev, [variables.quotationId]: "" }));
-      setEmailStatus((prev) => ({ ...prev, [variables.quotationId]: "Email sent!" }));
-    },
-    onError: (_err, variables) => {
-      setEmailStatus((prev) => ({ ...prev, [variables.quotationId]: "Failed to send email." }));
-    },
-  });
+  // Email sending temporarily disabled
+  // const sendEmailMutation = useMutation({
+  //   mutationFn: async ({ quotationId, recipient }: { quotationId: number; recipient: string }) => {
+  //     await api.post(`/quotations/${quotationId}/send-email`, {
+  //       recipient,
+  //       message: aiBrief || undefined,
+  //     });
+  //   },
+  //   onSuccess: (_data, variables) => {
+  //     setEmailTargets((prev) => ({ ...prev, [variables.quotationId]: "" }));
+  //     setEmailStatus((prev) => ({ ...prev, [variables.quotationId]: "Email sent!" }));
+  //   },
+  //   onError: (_err, variables) => {
+  //     setEmailStatus((prev) => ({ ...prev, [variables.quotationId]: "Failed to send email." }));
+  //   },
+  // });
 
   const downloadQuotationPdf = (quotationId: number) =>
     downloadFile(`/exports/pdf/quotations/${quotationId}`, `quotation-${quotationId}.pdf`, "application/pdf");
@@ -466,6 +468,7 @@ export default function QuotationsPage() {
                         PDF
                       </button>
                     </div>
+                    {/* Email sending temporarily disabled
                     <div className="mt-3 flex flex-col gap-2 text-sm">
                       <div className="flex flex-wrap gap-2">
                         <input
@@ -503,6 +506,7 @@ export default function QuotationsPage() {
                         <p className="text-xs text-[var(--muted)]">{emailStatus[quotation.id]}</p>
                       )}
                     </div>
+                    */}
                   </article>
                 ))}
               </div>
