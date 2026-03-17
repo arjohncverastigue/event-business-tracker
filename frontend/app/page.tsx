@@ -94,18 +94,6 @@ export default function Home() {
             Anyone who needs to track events, invoices, and client relationships without enterprise software complexity.
           </p>
         </div>
-
-        <div className="mx-auto mt-12 flex flex-col items-center gap-4 text-center">
-          <p className="text-[var(--muted)]">Have feedback? Help us improve!</p>
-          <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSfrZ_6Y5yxdAQC9T5sdzh5Ek5lBiK5WSSK89KwHfc4hHbkh3w/viewform"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="cta-button px-6 py-2 text-sm uppercase tracking-wide"
-          >
-            Share Feedback
-          </a>
-        </div>
       </div>
     </main>
   );
