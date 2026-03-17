@@ -18,7 +18,10 @@ type SidebarProps = {
   className?: string;
 };
 
-export function Sidebar({ onClose, className = 'hidden lg:flex lg:flex-col' }: SidebarProps) {
+export function Sidebar({ onClose, className }: SidebarProps) {
+  const baseClassName = onClose 
+    ? 'fixed inset-0 z-50 w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl'
+    : 'hidden lg:flex lg:flex-col w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl';
   const pathname = usePathname();
   const router = useRouter();
 
@@ -30,8 +33,7 @@ export function Sidebar({ onClose, className = 'hidden lg:flex lg:flex-col' }: S
   };
 
   return (
-    <aside
-      className={`w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl ${className}`}
+    <aside className={`${baseClassName} ${className || ''}`}
     >
       <div className="flex items-start justify-between gap-4">
         <div>
