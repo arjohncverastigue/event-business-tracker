@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
-import { ArrowRight, Calendar, FileText, WalletCards, Loader2 } from "lucide-react";
+import { ArrowRight, Calendar, FileText, Package, ShieldAlert, WalletCards, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bar,
@@ -21,7 +21,7 @@ import {
 
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import api from "@/lib/api";
-import type { Booking, Finance, Quotation } from "@/types";
+import type { Booking, DamageReport, Equipment, Finance, Quotation } from "@/types";
 
 export default function DashboardPage() {
   const token = useRequireAuth();
@@ -49,6 +49,24 @@ export default function DashboardPage() {
     queryKey: ["dashboard-quotations"],
     queryFn: async (): Promise<Quotation[]> => {
       const { data } = await api.get("/quotations");
+      return data;
+    },
+    enabled: shouldFetch,
+  });
+
+  const equipmentQuery = useQuery({
+    queryKey: ["dashboard-equipment"],
+    queryFn: async (): Promise<Equipment[]> => {
+      const { data } = await api.get("/equipment");
+      return data;
+    },
+    enabled: shouldFetch,
+  });
+
+  const damageReportsQuery = useQuery({
+    queryKey: ["dashboard-damage-reports"],
+    queryFn: async (): Promise<DamageReport[]> => {
+      const { data } = await api.get("/damage-reports");
       return data;
     },
     enabled: shouldFetch,
@@ -87,6 +105,28 @@ export default function DashboardPage() {
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [quotationsQuery.data]);
 
+  const equipmentStats = useMemo(() => {
+    if (!equipmentQuery.data) return { total: 0, available: 0, rented: 0, maintenance: 0 };
+    const data = equipmentQuery.data;
+    return {
+      total: data.reduce((sum, e) => sum + Number(e.quantity || 0), 0),
+      available: data.filter((e) => e.availability_status === "available").length,
+      rented: data.filter((e) => e.availability_status === "rented").length,
+      maintenance: data.filter((e) => e.availability_status === "maintenance").length,
+    };
+  }, [equipmentQuery.data]);
+
+  const damageStats = useMemo(() => {
+    if (!damageReportsQuery.data) return { total: 0, pending: 0, repaired: 0, totalCost: 0 };
+    const data = damageReportsQuery.data;
+    return {
+      total: data.length,
+      pending: data.filter((d) => d.status === "pending_repair").length,
+      repaired: data.filter((d) => d.status === "repaired").length,
+      totalCost: data.reduce((sum, d) => sum + Number(d.repair_cost || 0), 0),
+    };
+  }, [damageReportsQuery.data]);
+
   if (!token) {
     return null;
   }
@@ -113,6 +153,20 @@ export default function DashboardPage() {
       href: "/quotations",
       actionLabel: "Build proposals",
     },
+    {
+      title: "Equipment",
+      description: "Manage rental equipment inventory and track availability.",
+      icon: Package,
+      href: "/equipment",
+      actionLabel: "View inventory",
+    },
+    {
+      title: "Damage Reports",
+      description: "Track damaged items and repair costs for audit trail.",
+      icon: ShieldAlert,
+      href: "/damage-reports",
+      actionLabel: "View reports",
+    },
   ];
 
   return (
@@ -132,7 +186,7 @@ export default function DashboardPage() {
           </Link>
         </header>
 
-        <section className="grid gap-6 md:grid-cols-3">
+        <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {highlightCards.map(({ title, description, icon: Icon, href, actionLabel }) => (
             <article key={title} className="rounded-3xl border border-white/10 bg-white/5 p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-teal-200">
@@ -206,40 +260,70 @@ export default function DashboardPage() {
           </article>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Quotation pipeline</p>
-              <h3 className="text-lg font-semibold text-white">Status distribution</h3>
+        <section className="grid gap-6 xl:grid-cols-2">
+          <article className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Equipment</p>
+                <h3 className="text-lg font-semibold text-white">Inventory Overview</h3>
+              </div>
+              {equipmentQuery.isFetching && <Loader2 size={16} className="animate-spin text-[var(--muted)]" />}
             </div>
-            {quotationsQuery.isFetching && <Loader2 size={16} className="animate-spin text-[var(--muted)]" />}
-          </div>
-          {quotationStatusData.length ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={quotationStatusData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={90}
-                    innerRadius={50}
-                    paddingAngle={3}
-                  >
-                    {quotationStatusData.map((_, index) => (
-                      <Cell key={_.name} fill={["#7ff0d3", "#ff9f7f", "#7f8bff", "#ffd479"][index % 4]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{ background: "rgba(0,0,0,0.8)", borderRadius: 12, border: "none" }}
-                    formatter={(value, name) => [`${value ?? 0} quotes`, name?.toString() ?? "Unknown"]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+            {equipmentQuery.data && equipmentQuery.data.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-white">{equipmentStats.total}</p>
+                  <p className="text-xs text-[var(--muted)]">Total Items</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-[#7ff0d3]">{equipmentStats.available}</p>
+                  <p className="text-xs text-[var(--muted)]">Available</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-[#ffd479]">{equipmentStats.rented}</p>
+                  <p className="text-xs text-[var(--muted)]">Rented</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-[#ff9f7f]">{equipmentStats.maintenance}</p>
+                  <p className="text-xs text-[var(--muted)]">Maintenance</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--muted)]">No equipment yet.</p>
+            )}
+          </article>
+
+          <article className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Damage Reports</p>
+                <h3 className="text-lg font-semibold text-white">Audit Trail</h3>
+              </div>
+              {damageReportsQuery.isFetching && <Loader2 size={16} className="animate-spin text-[var(--muted)]" />}
             </div>
-          ) : (
-            <p className="text-sm text-[var(--muted)]">No quotations yet.</p>
-          )}
+            {damageReportsQuery.data && damageReportsQuery.data.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-white">{damageStats.total}</p>
+                  <p className="text-xs text-[var(--muted)]">Total Reports</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-[#ff9f7f]">{damageStats.pending}</p>
+                  <p className="text-xs text-[var(--muted)]">Pending Repair</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-[#7ff0d3]">{damageStats.repaired}</p>
+                  <p className="text-xs text-[var(--muted)]">Repaired</p>
+                </div>
+                <div className="rounded-2xl bg-black/20 p-4">
+                  <p className="text-2xl font-semibold text-white">${damageStats.totalCost.toLocaleString()}</p>
+                  <p className="text-xs text-[var(--muted)]">Total Cost</p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-[var(--muted)]">No damage reports yet.</p>
+            )}
+          </article>
         </section>
       </div>
     </main>

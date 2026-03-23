@@ -6,7 +6,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 
 import { Sidebar } from '@/components/Sidebar';
 
-const SIDEBAR_PREFIXES = ['/dashboard', '/bookings', '/finances', '/quotations'];
+const SIDEBAR_PREFIXES = ['/dashboard', '/bookings', '/finances', '/quotations', '/equipment', '/damage-reports'];
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -14,12 +14,28 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    setIsSidebarOpen(true);
-  }, [pathname, showSidebar]);
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsSidebarOpen(false);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="flex min-h-screen">
-      {showSidebar && isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
+      {showSidebar && isSidebarOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden" 
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <Sidebar onClose={() => setIsSidebarOpen(false)} className="relative z-50" />
+        </>
+      )}
       <main className="relative flex-1 px-4 py-4 lg:px-12 lg:py-10">{children}</main>
       {showSidebar && !isSidebarOpen && (
         <button

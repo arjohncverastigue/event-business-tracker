@@ -2,21 +2,33 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Calendar, FileText, Home, LogOut, Menu, Wallet } from 'lucide-react';
+import { Calendar, FileText, Home, LogOut, Menu, Package, ShieldAlert, Wallet, MessageCircle } from 'lucide-react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/bookings', label: 'Bookings', icon: Calendar },
   { href: '/finances', label: 'Finances', icon: Wallet },
   { href: '/quotations', label: 'Quotations', icon: FileText },
+  { href: '/equipment', label: 'Equipment', icon: Package },
+  { href: '/damage-reports', label: 'Damage Reports', icon: ShieldAlert },
 ];
+
+const feedbackLink = {
+  href: 'https://docs.google.com/forms/d/e/1FAIpQLSfrZ_6Y5yxdAQC9T5sdzh5Ek5lBiK5WSSK89KwHfc4hHbkh3w/viewform',
+  label: 'Feedback',
+  icon: MessageCircle,
+  external: true,
+};
 
 type SidebarProps = {
   onClose?: () => void;
   className?: string;
 };
 
-export function Sidebar({ onClose, className = 'hidden lg:flex lg:flex-col' }: SidebarProps) {
+export function Sidebar({ onClose, className }: SidebarProps) {
+  const baseClassName = onClose 
+    ? 'fixed inset-0 z-50 w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl'
+    : 'hidden lg:flex lg:flex-col w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl';
   const pathname = usePathname();
   const router = useRouter();
 
@@ -28,8 +40,7 @@ export function Sidebar({ onClose, className = 'hidden lg:flex lg:flex-col' }: S
   };
 
   return (
-    <aside
-      className={`w-64 shrink-0 border-r border-white/10 bg-black/40 px-6 py-8 text-sm text-white/70 backdrop-blur-xl ${className}`}
+    <aside className={`${baseClassName} ${className || ''}`}
     >
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -65,6 +76,25 @@ export function Sidebar({ onClose, className = 'hidden lg:flex lg:flex-col' }: S
             </Link>
           );
         })}
+        {feedbackLink.external ? (
+          <a
+            href={feedbackLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            <feedbackLink.icon size={18} />
+            <span>{feedbackLink.label}</span>
+          </a>
+        ) : (
+          <Link
+            href={feedbackLink.href}
+            className="flex items-center gap-3 rounded-2xl px-4 py-3 text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            <feedbackLink.icon size={18} />
+            <span>{feedbackLink.label}</span>
+          </Link>
+        )}
       </nav>
       <div className="mt-auto space-y-3 text-xs text-[var(--muted)]">
         <p>Plan smarter. Finish faster.</p>

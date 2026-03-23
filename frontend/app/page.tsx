@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Calendar, LineChart, ShieldCheck } from "lucide-react";
+import { Calendar, LineChart, ShieldCheck, Users, Sparkles } from "lucide-react";
 
 const features = [
   {
@@ -13,10 +13,22 @@ const features = [
     icon: LineChart,
   },
   {
+    title: "AI-Powered Quotations",
+    description: "Generate professional proposals with AI suggestions, export to PDF, and email directly to clients.",
+    icon: Sparkles,
+  },
+  {
     title: "Secure Auth",
     description: "JWT-powered authentication keeps vendor and client data protected end-to-end.",
     icon: ShieldCheck,
   },
+];
+
+const targetAudience = [
+  { title: "Event Planners", description: "Wedding planners, corporate event coordinators, party organizers" },
+  { title: "Small Business Owners", description: "Venues, caterers, photographers, decorators" },
+  { title: "Freelancers", description: "Independent contractors managing multiple clients" },
+  { title: "Agency Teams", description: "Small agencies needing a simple CRM + financial tool" },
 ];
 
 export default function Home() {
@@ -33,7 +45,7 @@ export default function Home() {
             </h1>
             <div className="flex flex-wrap gap-4">
               <Link href="/register" className="cta-button px-8 py-3 text-sm uppercase tracking-wide">
-                Create Workspace
+                Start Free Trial
               </Link>
               <Link
                 href="/login"
@@ -63,6 +75,24 @@ export default function Home() {
           <div className="rounded-full border border-white/10 px-4 py-2">Bookings + finances shipped</div>
           <div className="rounded-full border border-white/10 px-4 py-2">Claude-powered quotations</div>
           <div className="rounded-full border border-white/10 px-4 py-2">FastAPI + Next.js stack</div>
+        </div>
+
+        <div className="mx-auto mt-8 w-full max-w-4xl space-y-8">
+          <h2 className="text-center text-2xl font-semibold text-white">Who is this for?</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {targetAudience.map(({ title, description }) => (
+              <div key={title} className="flex gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                <Users className="mt-1 h-5 w-5 flex-shrink-0 text-teal-200" />
+                <div>
+                  <p className="font-medium text-white">{title}</p>
+                  <p className="text-sm text-[var(--muted)]">{description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-sm text-[var(--muted)]">
+            Anyone who needs to track events, invoices, and client relationships without enterprise software complexity.
+          </p>
         </div>
       </div>
     </main>

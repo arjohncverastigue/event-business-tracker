@@ -10,6 +10,31 @@ export type Booking = {
   created_at: string;
 };
 
+export type Equipment = {
+  id: number;
+  user_id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  condition: string;
+  availability_status: string;
+  notes?: string | null;
+  created_at: string;
+};
+
+export type DamageReport = {
+  id: number;
+  user_id: number;
+  equipment_id: number;
+  equipment_name?: string;
+  client: string;
+  description: string;
+  date_reported: string;
+  repair_cost: number;
+  status: string;
+  created_at: string;
+};
+
 export type Finance = {
   id: number;
   entry_type: 'income' | 'expense';

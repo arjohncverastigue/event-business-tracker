@@ -16,6 +16,8 @@ from app.routers import (
     finances as finances_router,
     quotations as quotations_router,
     exports as exports_router,
+    equipment as equipment_router,
+    damage_reports as damage_reports_router,
 )
 
 
@@ -44,6 +46,8 @@ app.include_router(bookings_router.router)
 app.include_router(finances_router.router)
 app.include_router(quotations_router.router)
 app.include_router(exports_router.router)
+app.include_router(equipment_router.router)
+app.include_router(damage_reports_router.router)
 
 
 @app.get("/health")
