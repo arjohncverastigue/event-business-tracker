@@ -63,9 +63,15 @@ The application runs at `http://localhost:3000`. Use the Register/Login pages to
 
 ## Day 3 Deliverables
 - ✅ SQLAlchemy JSON-backed quotation items with full CRUD routes.
-- ✅ Claude-powered quotation suggestion endpoint with graceful fallback behavior.
+- ✅ Gemini-powered quotation suggestion endpoint with graceful fallback behavior.
 - ✅ Quotations App Router page featuring AI brief assistant, editable line items, and live preview totals.
 - ✅ Updated dashboard & landing messaging to surface the new workflow.
+
+## Gemini Assist & Key Rotation
+1. Create or rotate a key from [Google AI Studio](https://aistudio.google.com/) and copy the value.
+2. Update `backend/.env` with `GEMINI_API_KEY=<new value>` (and optionally `GEMINI_MODEL=models/gemini-1.5-flash-latest`). Keep this file out of git commits.
+3. Restart the FastAPI server (`uvicorn app.main:app --reload`) so the new credentials are loaded. The frontend automatically consumes the refreshed backend without further changes.
+4. For extra safety, delete the old key in AI Studio once the new one works, then regenerate the backend container/environment variables in production if applicable.
 
 ## Day 4 Deliverables
 - ✅ ReportLab PDF exports for single quotations and full finance reports.

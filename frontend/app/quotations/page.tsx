@@ -343,7 +343,7 @@ export default function QuotationsPage() {
               <div className="flex items-center gap-3 text-white">
                 <Sparkles size={20} />
                 <div>
-                  <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Claude assist</p>
+                  <p className="text-xs uppercase tracking-[0.4em] text-[var(--muted)]">Gemini assist</p>
                   <p className="text-lg font-semibold">Generate line items from a brief</p>
                 </div>
               </div>
@@ -359,8 +359,12 @@ export default function QuotationsPage() {
                 disabled={!aiBrief || aiMutation.isPending}
                 className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 px-4 py-2 text-sm text-white/80 hover:text-white disabled:opacity-50"
               >
-                {aiMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : "Generate with Claude"}
+                {aiMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : "Generate with Gemini"}
               </button>
+              <p className="text-xs text-[var(--muted)]">
+                Powered by Google Gemini 1.5 Flash. Your API key stays on the server, so briefs you type here never
+                leave the secure FastAPI backend directly from the browser.
+              </p>
               {aiMutation.isError && (
                 <p className="text-sm text-red-300">Unable to fetch AI suggestion. Please try again.</p>
               )}

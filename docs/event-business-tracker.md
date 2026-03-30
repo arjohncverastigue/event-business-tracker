@@ -39,7 +39,7 @@ event-business-tracker/
 │   │   │   └── exports.py
 │   │   ├── schemas/          # Pydantic schemas
 │   │   ├── services/
-│   │   │   ├── ai_service.py      # Claude API
+│   │   │   ├── ai_service.py      # Google Gemini API
 │   │   │   ├── email_service.py   # SMTP email
 │   │   │   ├── pdf_service.py     # PDF generation
 │   │   │   └── excel_service.py   # Excel export
@@ -62,7 +62,7 @@ event-business-tracker/
 | Backend | FastAPI + Uvicorn |
 | Database | SQLite + SQLAlchemy |
 | Auth | JWT (python-jose) + bcrypt |
-| AI | Anthropic Claude API |
+| AI | Google Gemini API |
 | PDF | WeasyPrint or ReportLab |
 | Excel | openpyxl |
 | Email | FastAPI-Mail (SMTP) |
@@ -85,7 +85,7 @@ npx shadcn-ui@latest init
 mkdir backend && cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install fastapi uvicorn sqlalchemy python-jose[cryptography] passlib[bcrypt] anthropic reportlab openpyxl fastapi-mail python-multipart python-dotenv
+pip install fastapi uvicorn sqlalchemy python-jose[cryptography] passlib[bcrypt] google-generativeai reportlab openpyxl fastapi-mail python-multipart python-dotenv
 ```
 
 ---
@@ -125,7 +125,7 @@ GET    /quotations
 POST   /quotations
 PUT    /quotations/{id}
 DELETE /quotations/{id}
-POST   /quotations/generate-ai     ← Claude AI
+POST   /quotations/generate-ai     ← Google Gemini AI
 POST   /quotations/{id}/send-email ← Email
 
 EXPORTS
@@ -153,7 +153,7 @@ GET    /dashboard/summary
 
 **Day 3 — Quotations + AI**
 - Build Quotations CRUD API + frontend
-- Integrate Claude API for AI-generated quotations
+- Integrate Google Gemini API for AI-generated quotations
 - Build quotation preview UI
 
 **Day 4 — Exports + Email**
@@ -172,7 +172,7 @@ GET    /dashboard/summary
 
 - **Day 1 completed**: Auth foundation, shared models, onboarding UI.
 - **Day 2 completed**: Bookings + finances APIs, React Query pages, Axios wiring to FastAPI.
-- **Day 3 completed**: Quotations CRUD, Claude-powered drafting endpoint, proposal UI/preview.
+- **Day 3 completed**: Quotations CRUD, Gemini-powered drafting endpoint, proposal UI/preview.
 - **Day 4 completed**: PDF/Excel exports plus FastAPI-Mail email sending and UI hooks.
 - **Day 5 completed**: Dashboard charts, theme toggle, and final refinement.
 
@@ -184,7 +184,8 @@ GET    /dashboard/summary
 ```env
 SECRET_KEY=your_jwt_secret_key
 ALGORITHM=HS256
-ANTHROPIC_API_KEY=your_claude_api_key
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=models/gemini-1.5-flash-latest
 MAIL_USERNAME=your@email.com
 MAIL_PASSWORD=your_email_password
 MAIL_SERVER=smtp.gmail.com
@@ -194,3 +195,8 @@ MAIL_SERVER=smtp.gmail.com
 ```env
 NEXT_PUBLIC_API_URL=https://localhost:8000
 ```
+
+### Gemini key rotation checklist
+1. Issue a new API key inside Google AI Studio and copy it locally.
+2. Update `backend/.env` (or your deployment secret store) with `GEMINI_API_KEY=<new value>` and restart the FastAPI process.
+3. After confirming `/quotations/generate-ai` works, revoke the previous key in AI Studio to prevent stale credentials from being used.

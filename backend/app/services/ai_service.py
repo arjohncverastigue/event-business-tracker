@@ -5,14 +5,9 @@ from typing import Any, Dict, List
 from fastapi import HTTPException
 
 try:
-    from anthropic import Anthropic
+    import google.generativeai as genai
 except ImportError:  # pragma: no cover
-    Anthropic = None  # type: ignore
-
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
-
-_client = Anthropic(api_key=ANTHROPIC_API_KEY) if (Anthropic and ANTHROPIC_API_KEY) else None
+    genai = None  # type: ignore
 
 SYSTEM_PROMPT = (
     "You are an expert event quotation assistant. Respond ONLY with valid JSON matching this schema: "
@@ -20,6 +15,17 @@ SYSTEM_PROMPT = (
     "Use 2-4 line items with realistic unit prices in USD."
 )
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash-latest")
+
+if genai and GEMINI_API_KEY:
+    try:  # pragma: no cover - configuration failure falls back gracefully
+        genai.configure(api_key=GEMINI_API_KEY)
+        _model = genai.GenerativeModel(model_name=GEMINI_MODEL, system_instruction=SYSTEM_PROMPT)
+    except Exception:
+        _model = None
+else:
+    _model = None
 
 def _normalize_item(raw: Dict[str, Any]) -> Dict[str, Any] | None:
     description = str(raw.get("description", "")).strip()
@@ -49,33 +55,40 @@ def _fallback_items(brief: str) -> List[Dict[str, Any]]:
 def generate_quote_outline(brief: str) -> List[Dict[str, Any]]:
     if not brief or not brief.strip():
         raise HTTPException(status_code=400, detail="Please provide an event brief.")
-    if not _client:
+    if not _model:
         return _fallback_items(brief)
 
+    generation_prompt = (
+        "Generate an itemized quotation for the following event brief. "
+        "Return strictly valid JSON with an `items` array. Do not add commentary.\n\n"
+        f"Brief: {brief.strip()}"
+    )
+
     try:
-        response = _client.messages.create(
-            model=ANTHROPIC_MODEL,
-            max_tokens=600,
-            temperature=0.3,
-            system=SYSTEM_PROMPT,
-            messages=[
+        response = _model.generate_content(
+            [
                 {
                     "role": "user",
-                    "content": (
-                        "Generate an itemized quotation for the following event brief. "
-                        "Return strictly valid JSON with an `items` array. Do not add commentary.\n\n"
-                        f"Brief: {brief.strip()}"
-                    ),
+                    "parts": [{"text": generation_prompt}],
                 }
             ],
+            generation_config={
+                "temperature": 0.3,
+                "max_output_tokens": 600,
+                "response_mime_type": "application/json",
+            },
         )
     except Exception:
         return _fallback_items(brief)
 
-    text_chunks = [
-        block.text for block in getattr(response, "content", []) if getattr(block, "type", "") == "text"
-    ]
-    raw_text = "".join(text_chunks).strip()
+    raw_text = getattr(response, "text", "").strip()
+    if not raw_text:
+        try:
+            raw_text = (
+                response.candidates[0].content.parts[0].text.strip()  # type: ignore[attr-defined]
+            )
+        except Exception:
+            raw_text = ""
 
     try:
         parsed = json.loads(raw_text)

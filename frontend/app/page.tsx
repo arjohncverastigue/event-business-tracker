@@ -73,9 +73,25 @@ export default function Home() {
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-[var(--muted)]">
           <div className="rounded-full border border-white/10 px-4 py-2">Bookings + finances shipped</div>
-          <div className="rounded-full border border-white/10 px-4 py-2">Claude-powered quotations</div>
+          <div className="rounded-full border border-white/10 px-4 py-2">Gemini-powered quotations</div>
           <div className="rounded-full border border-white/10 px-4 py-2">FastAPI + Next.js stack</div>
         </div>
+
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-teal-200">
+              <Sparkles size={24} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.6em] text-[var(--muted)]">Gemini Assist</p>
+              <p className="text-lg font-semibold text-white">Powered by Google Gemini 1.5 Flash</p>
+              <p className="text-sm text-[var(--muted)]">
+                Briefs are sent from the backend only, with your API key stored in <code>backend/.env</code> so no
+                secrets reach the browser. Swap or rotate keys any time without redeploying the UI.
+              </p>
+            </div>
+          </div>
+        </section>
 
         <div className="mx-auto mt-8 w-full max-w-4xl space-y-8">
           <h2 className="text-center text-2xl font-semibold text-white">Who is this for?</h2>
