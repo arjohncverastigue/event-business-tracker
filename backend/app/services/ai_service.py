@@ -16,7 +16,7 @@ SYSTEM_PROMPT = (
 )
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash-latest")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 if genai and GEMINI_API_KEY:
     try:  # pragma: no cover - configuration failure falls back gracefully
@@ -66,16 +66,10 @@ def generate_quote_outline(brief: str) -> List[Dict[str, Any]]:
 
     try:
         response = _model.generate_content(
-            [
-                {
-                    "role": "user",
-                    "parts": [{"text": generation_prompt}],
-                }
-            ],
+            generation_prompt,
             generation_config={
                 "temperature": 0.3,
-                "max_output_tokens": 600,
-                "response_mime_type": "application/json",
+                "max_output_tokens": 900,
             },
         )
     except Exception:
@@ -89,6 +83,10 @@ def generate_quote_outline(brief: str) -> List[Dict[str, Any]]:
             )
         except Exception:
             raw_text = ""
+
+    if raw_text.startswith("```"):
+        fence_lines = raw_text.splitlines()
+        raw_text = "\n".join(fence_lines[1:-1]).strip() if len(fence_lines) >= 3 else ""
 
     try:
         parsed = json.loads(raw_text)

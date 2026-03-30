@@ -185,7 +185,7 @@ GET    /dashboard/summary
 SECRET_KEY=your_jwt_secret_key
 ALGORITHM=HS256
 GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=models/gemini-1.5-flash-latest
+GEMINI_MODEL=gemini-2.5-flash
 MAIL_USERNAME=your@email.com
 MAIL_PASSWORD=your_email_password
 MAIL_SERVER=smtp.gmail.com
