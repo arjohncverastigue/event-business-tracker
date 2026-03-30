@@ -312,7 +312,8 @@ export default function QuotationsPage() {
                     <input
                       type="number"
                       min={0}
-                      step="50"
+                      step="1"
+                      inputMode="decimal"
                       value={item.unit_price}
                       onChange={(event) => updateItem(index, "unit_price", event.target.value)}
                       className="rounded-2xl border border-white/15 bg-transparent px-3 py-2 text-white outline-none focus:border-[var(--accent)]"

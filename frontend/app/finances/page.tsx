@@ -202,7 +202,8 @@ export default function FinancesPage() {
                   <input
                     type="number"
                     min="0"
-                    step="50"
+                    step="1"
+                    inputMode="decimal"
                     value={form.amount}
                     onChange={(event) => setForm((prev) => ({ ...prev, amount: event.target.value }))}
                     className="w-full rounded-2xl border border-white/15 bg-black/20 px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
